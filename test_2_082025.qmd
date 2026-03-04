@@ -1,0 +1,544 @@
+---
+title: "Sampling Distributions, Sample Size, and Statistical Powere"
+author: "<br><br><span style='font-size:25px;'><strong>Lesley Chapman Hannah, Ph.D., M.S.</strong></span><br>College of Graduate Studies<br>Northeast Ohio Medical University"
+format:
+  revealjs:
+    theme: simple
+    slide-number: true
+#    incremental: true
+    chalkboard: true
+    transition: fade
+execute:
+  echo: true
+  warning: false
+  message: false
+---
+
+```{r, echo=FALSE}
+#| label: setup-lecture3
+library(tidyverse)
+set.seed(29)
+```
+
+
+```{r, echo=FALSE}
+
+library(tidyverse)
+set.seed(29)
+
+# synthetic population
+N <- 200000
+pop <- tibble(
+  age_group = sample(c("Younger", "Older"), size = N, replace = TRUE, prob = c(0.6, 0.4)),
+  # biomarker depends on age group (e.g., systolic BP, CRP, etc.)
+  biomarker = if_else(age_group == "Older",
+                      rnorm(N, mean = 130, sd = 15),
+                      rnorm(N, mean = 118, sd = 15))
+)
+
+```
+
+### Lecture Overview
+
+**Sampling distributions**
+
+- how statistics vary across repeated samples
+
+**Sampling strategies**
+
+- procedures used to select observations from a population
+
+**Sample size and uncertainty**
+
+- how the number of observations affects precision and power
+
+**Precision and statistical power**
+
+- designing studies that can estimate parameters or detect meaningful effects
+
+---
+
+## Sampling distribution: Definition
+
+- **sampling distribution**: probability distribution of a statistic computed from all possible samples of a fixed size from a population
+
+Key distinction(s):
+
+- population parameter: fixed, unknown constant [μ, p, λ]
+- sample statistic: random variable [$\bar{X}$, $\hat{p}$, etc.]
+- sampling distribution: distribution of the statistic across repeated samples
+
+
+---
+
+### Sampling in biomedical research
+<div style="font-size:0.6em">
+
+**Review**: we rarely observe an entire population [i.e.: all patients, all tumors, all genomes] instead a sample is taken and generalized for statistical analysis
+
+- sampling, bias, and sample size determine whether your study’s conclusions are:
+
+  - valid [not systematically wrong]
+  - precise [narrow uncertainty]
+  - reproducible [another cohort gives compatible results]
+  - actionable [effects are detectable at clinically meaningful scales]
+
+</div>
+
+---
+
+### Sampling and Statistical Analysis
+<div style="font-size:0.6em">
+
+A core objective of statistical analysis is to determine:
+
+> Does this sample allow the researcher to learn something true about a population?
+
+
+Three components determine the answer:
+
+1. **sampling strategy**: defines who your data stand for
+2. **bias**: determines whether your estimate is systematically distorted.
+3. **sample size**: determines how much random uncertainty remains
+
+
+</div>
+
+---
+
+### Sampling strategies
+
+<div style="font-size:0.6em">
+
+**Sampling strategy**: 
+
+  - pre-specified procedure for selecting observations from a defined target population 
+  - determines who can be selected, how selection occurs, and each unit’s inclusion probability
+
+**Importance in practice**:
+
+- determines whether estimates [i.e.: prevalence, mean biomarker level, incidence rate] generalize to the target population
+- determines whether standard errors / confidence intervals are trustworthy
+- determines the feasibility and cost of data collection [i.e.: multi-site, registries, EHRs, biobanks]
+
+**Examples**:
+
+- selecting patients from a hospital registry to estimate readmission risk
+- selecting biospecimens from a biobank to characterize a biomarker distribution
+- selecting sequencing samples from a case series to study mutation spectra
+
+</div>
+
+---
+
+### Sampling Strategies
+<div style="font-size:0.6em">
+
+- **simple Random Sample [SRS]**: every set of n units has equal chance of selection
+  - strength: clean inference
+  - weakness: requires full sampling frame
+
+- **stratified sampling**: divide into strata [age, sex, ancestry, site] then sample within strata
+
+  - strength: ensures subgroup representation and increases precision
+  - note: disproportionate sampling may require weights
+
+- **cluster/multistage sampling**: sample clusters [hospitals/clinics] then sample individuals within clusters
+
+- **systematic sampling**: random start, then every $k^{th}$ unit from an ordered list
+
+</div>
+
+---
+
+
+### Sample size considerations
+<div style="font-size:0.6em">
+
+**sample size considerations**: 
+
+  - structured decisions used to determine how many observational units are required within a sample
+  - how the observations should be distributed across groups or strata so that statistical estimates are sufficiently precise and comparisons have adequate power
+  
+structured process used to determine if there is enough data to answer the scientific question reliably, and considers:
+
+  - how many observational units [patients, specimens, encounters, variants] must be included
+  - how those units should be allocated across groups or strata
+
+
+sample size is determined by several factors such as:
+
+  - parameter you want to estimate [mean, proportion, rate, hazard]
+  - variability of the outcome
+  - smallest clinically meaningful effect
+  - sampling design [SRS, stratified, clustered]
+
+
+
+
+</div>
+
+---
+
+### Sample size considerations
+<div style="font-size:0.6em">
+
+**Small sample size characteristics**:
+
+  - estimates are more variable
+  - standard errors are larger
+  - confidence intervals are wider
+  - statistical tests have lower power
+  - sampling distributions may not approximate normality
+
+**Implications**:
+
+  - results could be less stable across repeated samples
+  - effect estimates may fluctuate substantially
+  - type II error [missing a real effect] is more likely
+
+**Commonly found in**:
+
+  - rare disease studies
+  - early-phase clinical trials
+  - pilot studies
+
+</div>
+
+---
+
+
+### Sample size considerations
+<div style="font-size:0.6em">
+
+**large sample sizes**:
+
+  - estimates are more precise
+  - smaller standard errors
+  - narrower confidence intervals
+  - higher statistical power
+  - sampling distributions approach normality 
+
+**implications**:
+
+  - greater stability across repeated sampling
+  - smaller effects become detectable
+  - more reliable inference
+
+</div>
+
+---
+
+### Why Sample Size Matters
+
+Data is collected to answer two types of questions:
+
+1. **Estimation questions**  
+   - What is the value of a biological parameter?
+
+2. **Comparison questions**  
+   - Do groups differ in a meaningful way?
+
+- sample size planning helps ensure that the data collected contain **enough information** to answer the research question
+
+---
+
+
+### Sample Size in Practice
+<div style="font-size:0.6em">
+
+1) `precision`: focuses on **estimation accuracy**
+
+  - Goal: choose sample size so that a confidence interval is narrow enough for the research question
+  - Core question: How uncertain is our estimate?
+  - larger n → smaller standard error → narrower confidence interval → greater precision
+  - example: estimating a treatment response rate within $±3%$
+  
+Example:
+
+> Estimate the response rate within **±3%**
+
+- sample size is chosen so the confidence interval width approximates the true estimate
+
+Interpretation:
+
+- estimate will vary across samples, but with sufficient $n$ the uncertainty becomes small enough to answer the research question
+
+
+</div>
+
+---
+
+### Sample Size in Practice
+<div style="font-size:0.6em">
+
+2)**Power**: detecting differences between groups
+
+  - goal is to compare groups or test a hypothesis
+  - Core question: If the true effect exists, what is the probability we detect it?
+  - choose n so that you can detect a clinically meaningful effect with high probability
+  - answers: If the true effect exists, what is the probability we detect it?
+  
+Depends on factors such as:
+  
+  - effect size: smaller effects require larger n
+  
+  - variability: more variability requires larger n
+  
+  - outcome type: binary, continuous, count, survival
+  
+</div>
+
+---
+  
+### Sample Size in Practice
+  <div style="font-size:0.6em">
+  
+  
+  3) **design adjustments**: : adjustments that ensure the study still contains enough effective information
+  
+  - design adjustments correct for:
+  - **independent observations**
+  - participants are naturally grouped [i.e.: patients grouped by hospital] > observations within a group/cluster tend to be correlated >> correlated observations contribute less independent information and reduces the effective sample size
+- solution: increase total enrollment to compensate
+- **complete data**: data missingness
+- loss of data reduces precision [wider confidence intervals] and power [lower probability of detecting true effects]
+- **simple random sampling**
+  - helps define the statistical benchmark for how information accumulates with increasing n
+
+</div>
+  
+---
+
+
+### Sample Size and Power Calculations
+  
+<div style="font-size:0.6em">
+
+Note:
+    
+> **Sample size depends on the inferential goal.**
+    
+Before computing our sample size (n), consider:
+    
+1) **Precision [estimation goal]**: degree to which repeated samples produce similar estimates of a population parameter
+
+Estimate a population parameter with sufficient precision
+
+Precision increases when:
+  
+- sample size [n] increases
+- outcome variability decreases
+- measurement error decreases
+
+</div>
+  
+---
+  
+### Sample Size and Power Calculations
+  
+<div style="font-size:0.5em">
+Note:
+  
+> **Sample size depends on the inferential goal.**
+  
+Before computing our sample size (n), consider:
+  
+2) **Power [comparison goal]** : probability that a statistical test correctly rejects a false null hypothesis  
+
+Detect a meaningful biological difference with high probability
+
+Power depends on:
+  
+- effect size [magnitude of true difference]
+- variability
+- sample size
+- significance level
+
+Note:
+  
+- precision : how well we measure
+- power : reliably we detect a signal
+</div>
+  
+---
+
+
+### Sample Size Calculations
+
+Before collecting data, we must answer:
+
+1. How precise do we want our estimates to be?
+2. How likely do we want to detect a meaningful difference?
+
+These are two different goals:
+
+- **precision** [estimation]
+- **power** [hypothesis testing]
+
+---
+
+### Sample Size and Power Calculation: Example
+  
+<div style="font-size:0.6em">
+  
+**Background**:  
+
+  - Tumor Mutational Burden (TMB) is the number of somatic mutations per megabase (mut/Mb)
+  - In colorectal cancer, tumors with deficient mismatch repair (**dMMR**) often show higher TMB than proficient mismatch repair (**pMMR**) tumors
+  
+**Research Task**:
+- A colorectal cancer genomics team is deciding whether to invest in deeper sequencing for mismatch-repair testing
+- The group wants to know whether dMMR tumors have meaningfully higher Tumor Mutational Burden (TMB) than pMMR tumors, using TMB as a quantitative signal of DNA repair deficiency
+
+
+**Why this is a good power calculation example**:
+  
+- outcome is **continuous** (mut/Mb), typical of genomics summary measures  
+- the effect size can be stated in biologically meaningful units (mut/Mb)
+
+**Power/Sample Size Questions**:
+
+`Precision question [determine sample size needed to estimate parameter]`:
+
+- How many dMMR tumor samples do we need so that our estimate of the mean TMB has a 95% confidence interval no wider than a prespecified margin [i.e.: ±2 mut/Mb]?
+
+`Power question [determine power to detect signal with sample size]`:
+
+How many tumors per group do we need so that we have 80% power to detect it at α = 0.05?
+
+</div>
+  
+---
+
+### Key Definitions
+<div style="font-size:0.5em">
+**parameter**: fixed but unknown population value [i.e.: $\mu_{dMMR}$]
+
+**statistic**: value calculated from the sample [i.e.: $\bar{x}_{dMMR}$]
+
+**standard error [SE]**: variability of a statistic across repeated samples
+
+**α**: false positive rate 
+
+  - Type I error - rejecting the null hypothesis when it is actually true
+  - significance level is set to a fixed value: α=0.05
+  
+**power = 1 − β**: 
+
+  - probability that your study will correctly detect a real effect
+  - β = probability of a Type II error [missing a real effect]
+
+For a mean:
+$$
+SE = \frac{\sigma}{\sqrt{n}}
+$$
+
+- $\sigma$ = population standard deviation  
+- $n$ = sample size  
+- $n$ increases $\rightarrow$ SE decreases
+</div>
+---
+
+
+### Example: Estimating Mean TMB
+
+<div style="font-size:0.5em">
+
+
+The following determines the sample size needed to estimate a mean given a desired **margin of error**
+
+margin of error for a confidence interval is:
+
+$$
+ME = z \cdot \frac{\sigma}{\sqrt{n}}
+$$
+
+Determine the following:
+
+Define the variability
+
+- $\sigma = 10$ mut/Mb  
+  - **σ**: estimated standard deviation of TMB from prior studies (mut/Mb)
+
+Define margin of error
+
+- Desired margin of error = 2 mut/Mb  
+
+Confidence Level [z-score]:
+
+- 95% confidence: $z = 1.96$
+
+Sample size formula:
+
+- calculate the minimum number of tumors required
+
+$$
+\left(\frac{z \sigma}{ME}\right)^2
+$$
+
+</div>
+
+---
+
+### Example: Estimating Mean TMB
+
+<div style="font-size:0.5em">
+
+
+```{r}
+sigma <- 10
+ME <- 2
+z <- 1.96
+
+n_precision <- (z * sigma / ME)^2
+
+#round up to ensure adequate precision
+ceiling(n_precision)
+```
+
+
+Interpretation:
+
+- study needs **at least 97 tumors** to estimate the mean TMB with a 95% confidence interval whose half-width is ±2 mut/Mb
+
+- if the study needs to be repeated study many times the estimated mean TMB would typically fall within 2 mut/Mb of the true population mean
+
+Note:
+
+Increasing sample size reduces uncertainty because
+
+$$
+SE = \frac{\sigma}{\sqrt{n}}
+$$
+
+As $n$ increases:
+
+- standard error decreases
+- confidence intervals become narrower
+- estimates become more precise
+
+</div>
+
+---
+
+### Summary
+
+- sampling distributions describe how a statistic behaves across repeated samples and provide the foundation for statistical inference. 
+
+- sampling design determines validity
+
+  - who the sample represents
+
+  - whether estimates generalize to the population. 
+
+- sample size determines uncertainty
+
+  - larger samples → smaller standard errors
+
+  - narrower confidence intervals
+
+  - greater statistical power
+
+---
+
