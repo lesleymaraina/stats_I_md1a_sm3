@@ -1,5 +1,5 @@
 ---
-title: "Sampling Distributions, Sample Size, and Statistical Powere"
+title: "Sampling Distributions, Sample Size, and Statistical Power"
 author: "<br><br><span style='font-size:25px;'><strong>Lesley Chapman Hannah, Ph.D., M.S.</strong></span><br>College of Graduate Studies<br>Northeast Ohio Medical University"
 format:
   revealjs:
@@ -39,7 +39,7 @@ pop <- tibble(
 ```
 
 ### Lecture Overview
-
+<div style="font-size:0.6em">
 **Sampling distributions**
 
 - how statistics vary across repeated samples
@@ -55,7 +55,7 @@ pop <- tibble(
 **Precision and statistical power**
 
 - designing studies that can estimate parameters or detect meaningful effects
-
+</div>
 ---
 
 ## Sampling distribution: Definition
@@ -460,6 +460,18 @@ Define the variability
 
 - $\sigma = 10$ mut/Mb  
   - **σ**: estimated standard deviation of TMB from prior studies (mut/Mb)
+
+
+
+</div>
+
+---
+
+
+### Example: Estimating Mean TMB
+
+<div style="font-size:0.5em">
+
 
 Define margin of error
 
